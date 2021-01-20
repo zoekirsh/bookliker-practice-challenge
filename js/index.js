@@ -30,16 +30,12 @@ function getOneBook(id) {
 // Patch
 
 function likeBook(book) {
-  const addUser = [...book.users, me]
-
   fetch(bookURL+`/${book.id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      "users": addUser
-    })
+    body: JSON.stringify(book)
   })
   .then(res => res.json())
   .then(book => {
@@ -89,12 +85,18 @@ function showBook(book) {
     li.textContent = user.username
     likers.appendChild(li)
   })
-  likeBtn.textContent = "❤️"
+    //like button logic
+  if (book.users.find(user => user.id == me.id)) {
+    likeBtn.textContent = "Remove ❤️"
+  } else {
+    likeBtn.textContent = "❤️"
+  }
   likeBtn.addEventListener("click", () => handleLike(book))
 
   container.append(img, title, subTitle, author, description, likers, likeBtn)
   showPanel.appendChild(container)
 }
+
 
 // HANDLERS
 function handleClick(e) {
@@ -102,5 +104,11 @@ function handleClick(e) {
 }
 
 function handleLike(book) {
+  if (book.users.find(user => user.id == me.id)) {
+    book.users.pop()
+  } else {
+    book.users.push(me)
+  }
+
   likeBook(book)
 }
